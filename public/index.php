@@ -4,9 +4,9 @@ use App\Controllers\AuthController;
 use App\Core\Application;
 use App\Controllers\TaskController;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once '../vendor/autoload.php';
 
-$app = new Application(dirname(__DIR__));
+$app = new Application('../');
 
 $app->router->get('/',[(new TaskController), 'index']);
 $app->router->post('/',[(new TaskController), 'create']);
