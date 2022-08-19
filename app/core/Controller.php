@@ -28,4 +28,16 @@ class Controller
     {
         return (new View)->renderView($view, $data);
     }
+
+    public function redirect(string $location)
+    {
+        header("location: $location");
+        exit;
+    }
+
+    public function back()
+    {
+        header('location: '. ($_SERVER['HTTP_REFERER'] ?? '/'));
+        exit;
+    }
 }
