@@ -8,7 +8,7 @@ class User extends Database
 {
     public int $id;
     public string $login;
-    protected string $password;
+    public string $password;
 
     public array $tasks;
 
@@ -20,33 +20,30 @@ class User extends Database
         $this->tasks = Task::getUserTasks($this->id);
     }
 
-    public static function findById(int $id) : User|false
+    public static function findById(int $id) : ?User
     {
         $user = self::getRow('SELECT * FROM users WHERE id = :id',['id' => $id]);
-        if (!$user) {
-            return false;
-        }
         return self::newInstance($user);
     }
 
-    public static function findByLogin(string $login) : User|false
+    public static function findByLogin(string $login) : ?User
     {
         $user = self::getRow('SELECT * FROM users WHERE login = :login',['login' => $login]);
         if (!$user) {
-            return false;
+            return null;
         }
         return self::newInstance($user);
     }
 
-    public function authorize(string $password) : bool
+    public static function checkPassword(string $password, string $hash) : bool
     {
-        if (password_verify($password, $this->password)) {
+        if (password_verify($password, $hash)) {
             return true;
         }
         return false;
     }
 
-    public static function create(array $data) : User|false
+    public static function create(array $data) : ?User
     {
         $data = [
             'login' => $data['login'],
@@ -55,7 +52,7 @@ class User extends Database
         if (self::run('INSERT INTO users (login, password) VALUES (:login, :password)',$data)){
             return self::findById(self::lastInsertId());
         }
-        return false;
+        return null;
     }
 
     private static function newInstance(array $data) : User

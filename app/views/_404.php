@@ -1,3 +1,1 @@
-<h1>Not found</h1>
-
-<? echo $title ?>
+<h1>Not found 404</h1>

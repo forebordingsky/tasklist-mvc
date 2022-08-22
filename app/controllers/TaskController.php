@@ -6,7 +6,6 @@ use App\Core\Application;
 use App\Core\Controller;
 use App\Core\Request;
 use App\Models\Task;
-use Exception;
 
 class TaskController extends Controller
 {
@@ -28,12 +27,16 @@ class TaskController extends Controller
             'description' => ['required', 'min3']
         ];
         if ($errors = $request->validate($rules)){
-            return $this->render('index', 'main', ['errors' => $errors]);
+            Application::$app->session->set('errors', $errors);
+            return $this->redirect('/');
         }
-        $data = $request->getBody();
+        $data = [
+            'user_id' => Application::$app->user->id,
+            'description' => $request->getBody()['description']
+        ];
         Task::create($data);
-        return $this->redirect('/');
-        //return $this->render('index','main', ['message' => 'Success.']);  
+        Application::$app->session->set('message', 'Success');
+        return $this->redirect('/'); 
     }
 
     public function delete(Request $request)
@@ -42,13 +45,16 @@ class TaskController extends Controller
             'id' => ['required']
         ];
         if ($errors = $request->validate($rules)){
-            return $this->render('index', 'main', ['errors' => $errors]);
+            Application::$app->session->set('errors', $errors);
+            return $this->redirect('/');
         }
         $data = $request->getBody();
         $result = Task::delete($data);
         if (!$result) {
-            throw new Exception('Not found');
+            Application::$app->session->set('message', 'Not found');
+            return $this->redirect('/');
         }
+        Application::$app->session->set('message', 'Success');
         return $this->redirect('/');
     }
 
@@ -58,18 +64,38 @@ class TaskController extends Controller
             'id' => ['required']
         ];
         if ($errors = $request->validate($rules)){
-            return $this->render('index', 'main', ['errors' => $errors]);
+            Application::$app->session->set('errors', $errors);
+            return $this->redirect('/');
         }
         $data = $request->getBody();
         $result = Task::changeStatus($data);
         if (!$result) {
-            throw new Exception('Not found');
+            Application::$app->session->set('message', 'Not found');
+            return $this->redirect('/');
         }
+        Application::$app->session->set('message', 'Success');
         return $this->redirect('/');
     }
 
-    public function readyAll(Request $request)
+    public function readyAll()
     {
-        
+        if (Application::$app->user) {
+            Task::readyAll(['userId' => Application::$app->user->id]);
+            Application::$app->session->set('message', 'Success');
+            return $this->redirect('/');
+        }
+        Application::$app->session->set('message', 'User not found');
+        return $this->redirect('/');
+    }
+
+    public function deleteAll()
+    {
+        if (Application::$app->user) {
+            Task::deleteAll(['user_id' => Application::$app->user->id]);    
+            Application::$app->session->set('message', 'Success');
+            return $this->redirect('/');
+        }
+        Application::$app->session->set('message', 'User not found');
+        return $this->redirect('/');
     }
 }

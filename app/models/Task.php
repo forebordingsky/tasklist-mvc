@@ -18,15 +18,13 @@ class Task extends Database
         $this->status = (bool)$status;
     }
 
-    public static function create(array $data) : Task|false
+    public static function create(array $data) : ?Task
     {
-        if (self::run('INSERT INTO tasks (user_id, description, status) VALUES (:user_id, :description, 0)',$data)){
-            return self::findById(self::lastInsertId());
-        }
-        return false;
+        self::run('INSERT INTO tasks (user_id, description) VALUES (:user_id, :description)',$data);
+        return self::findById(self::lastInsertId());
     }
 
-    public static function delete(array $data)
+    public static function delete(array $data) : bool
     {
         $task = self::findById($data['id']);
         if ($task) {
@@ -56,23 +54,29 @@ class Task extends Database
         return false;
     }
 
-    public static function readyAll(array $data)
+    public static function readyAll(array $data) : bool
     {
         $tasks = self::getUserTasks($data['userId']);
         if (count($tasks)) {
+            $stmt = self::prepare('UPDATE tasks SET status = 1 WHERE id = :id');
             foreach ($tasks as $task) {
-                self::run('UPDATE tasks SET status = 1 WHERE id = :id', ['id' => $task->id]);
+                $stmt->execute(['id' => $task->id]);
             }
             return true;
         }
         return false;
     }
+
+    public static function deleteAll(array $data) : void
+    {
+        self::run('DELETE FROM tasks WHERE user_id = :user_id',$data);
+    }
     
-    public static function findById(int $id) : Task|false
+    public static function findById(int $id) : ?Task
     {
         $task = self::getRow('SELECT * FROM tasks WHERE id = :id',['id' => $id]);
         if (!$task) {
-            return false;
+            return null;
         }
         return self::newInstance($task);
     }

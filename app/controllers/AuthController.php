@@ -24,19 +24,20 @@ class AuthController extends Controller
             'password' => ['required', 'min3']
         ];
         if ($errors = $request->validate($rules)){
-            return $this->render('login', 'main', ['errors' => $errors]);
+            Application::$app->session->set('errors', $errors);
+            return $this->redirect('/login');
         }
         $data = $request->getBody();
         $user = User::findByLogin($data['login']);
-        if ($user == false) {
-            User::create($data);
+        if ($user === null) {
+            $user = User::create($data);
         }
-        if ($user->authorize($data['password'])) {
+        if (User::checkPassword($data['password'], $user->password)) {
             Application::$app->login($user);
             return $this->redirect('/');
         }
-        return $this->render('login', 'main', ['message' => 'Wrong login or password.']);
-        
+        Application::$app->session->set('message', 'Wrong login or password.');
+        return $this->redirect('/login');
     }
 
     public function logoutHandler()

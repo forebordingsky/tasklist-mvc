@@ -95,14 +95,14 @@ class Request
                     $errors[$attribute][] = ucfirst($attribute) . ' field must contain only characters and numbers.';
                 }
                 if (strpos($rule, 'min') !== false) {
-                    $minRule = explode('min',$rule)[1];
-                    if ($data[$attribute] < $minRule) {
+                    $minRule = (int)explode('min',$rule)[1];
+                    if (strlen($data[$attribute]) < $minRule) {
                         $errors[$attribute][] = ucfirst($attribute) . ' field must be atleast ' . $minRule . ' characters.';
                     }
                 }
                 if (strpos($rule, 'max') !== false) {
-                    $maxRule = explode('max',$rule)[1];
-                    if ($data[$attribute] > $maxRule) {
+                    $maxRule = (int)explode('max',$rule)[1];
+                    if (strlen($data[$attribute]) > $maxRule) {
                         $errors[$attribute][] = ucfirst($attribute) . ' field should not be more than ' . $maxRule . ' characters.';
                     }
                 }

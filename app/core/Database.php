@@ -42,6 +42,11 @@ class Database
         return self::$db->prepare($stmt);
     }
 
+    public static function exec(string $query)
+    {
+        return self::$db->exec($query);
+    }
+
     public static function run(string $query, array $args = [])
     {
         try {
