@@ -10,11 +10,14 @@ class User extends Database
     public string $login;
     protected string $password;
 
+    public array $tasks;
+
     private function __construct(int $id, string $login, string $password)
     {
         $this->id = $id;
         $this->login = $login;
         $this->password = $password;
+        $this->tasks = Task::getUserTasks($this->id);
     }
 
     public static function findById(int $id) : User|false

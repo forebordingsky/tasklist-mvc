@@ -6,6 +6,7 @@ use App\Core\Application;
 use App\Core\Controller;
 use App\Core\Request;
 use App\Models\Task;
+use Exception;
 
 class TaskController extends Controller
 {
@@ -14,11 +15,9 @@ class TaskController extends Controller
         if (Application::isGuest()) {
             return $this->redirect('/login');
         }
-        $userTasks = Task::getUserTasks();
-        return $this->renderView('index',[
+        return $this->render('index','main',[
             'title' => 'Main page',
-            'user' => Application::$app->user,
-            'userTasks' => $userTasks
+            'user' => Application::$app->user
         ]);
         
     }
@@ -33,6 +32,44 @@ class TaskController extends Controller
         }
         $data = $request->getBody();
         Task::create($data);
-        return $this->render('index','main', ['message' => 'Success.']);  
+        return $this->redirect('/');
+        //return $this->render('index','main', ['message' => 'Success.']);  
+    }
+
+    public function delete(Request $request)
+    {
+        $rules = [
+            'id' => ['required']
+        ];
+        if ($errors = $request->validate($rules)){
+            return $this->render('index', 'main', ['errors' => $errors]);
+        }
+        $data = $request->getBody();
+        $result = Task::delete($data);
+        if (!$result) {
+            throw new Exception('Not found');
+        }
+        return $this->redirect('/');
+    }
+
+    public function changeStatus(Request $request)
+    {
+        $rules = [
+            'id' => ['required']
+        ];
+        if ($errors = $request->validate($rules)){
+            return $this->render('index', 'main', ['errors' => $errors]);
+        }
+        $data = $request->getBody();
+        $result = Task::changeStatus($data);
+        if (!$result) {
+            throw new Exception('Not found');
+        }
+        return $this->redirect('/');
+    }
+
+    public function readyAll(Request $request)
+    {
+        
     }
 }

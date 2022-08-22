@@ -1,0 +1,39 @@
+body{
+    font-family: sans-serif;
+}
+
+.button{
+    border: none;
+    text-decoration: none;
+    color: black;
+    text-transform: uppercase;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 3px 5px;
+    background-color: transparent;
+    font-size: 14px;
+    font-family: sans-serif;
+    
+}
+.button:hover{
+    cursor: pointer;
+    background-color: black;
+    color: white;
+}
+.circle{
+    width: 50px; 
+    height: 50px; 
+    border-radius: 100%;
+    align-self: center;
+}
+.login-form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+.login-form input,.login-form button{
+    max-width: 400px;
+}
